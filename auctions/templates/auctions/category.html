@@ -1,0 +1,12 @@
+{% extends 'auctions/layout.html' %}
+
+{% block body %}
+    <h2>Categories</h2>
+    {% for item in categories %}
+      <div class="list-group">
+        <a href="category/{{ item.code }}" class="list-group-item list-group-item-action" aria-current="true">
+          {{ item.category }}
+        </a>
+      </div>
+    {% endfor %}
+{% endblock %}

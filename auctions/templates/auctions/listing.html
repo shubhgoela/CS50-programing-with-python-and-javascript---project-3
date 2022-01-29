@@ -1,0 +1,94 @@
+{% extends 'auctions/layout.html' %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-10"><h1>Listing : {{ listing.title }}</h1></div>
+        {% if user.id == listing.user.id and listing.status != "CLOSED" %}
+        <form action = "{{ listing.id }}" method="POST">
+            {% csrf_token %}
+            <input type="number" hidden name="listing" value ="{{ listing.id }}">
+            <div class="col-2"><button class="btn btn-primary" type="submit" name="status" value="CLOSED">Close auction</button></div>
+        </form>
+        {% endif %}
+      </div>
+    {% if  listing.status != "CLOSED" %} 
+        <form action='{{ listing.id }}', method="POST">
+            {% csrf_token %}
+            {{ watchlistform }}
+            {% if watchlist %}
+                <button class="badge bg-secondary" type="submit" value="Remove" name="watchlist">Remove from watchlist</button>
+            {% else %}
+                <button class="badge bg-secondary" type="submit" value="Add" name="watchlist">Add to watchlist</button>
+            {% endif %}
+        </form>
+    {% else %}
+        {% if watchlist %}
+            <form action='{{ listing.id }}', method="POST">
+                {% csrf_token %}
+                {{ watchlistform }}
+                <button class="badge bg-secondary" type="submit" value="Remove" name="watchlist">Remove from watchlist</button>
+            </form>
+        {% endif %}
+    {% endif %}
+    <br>
+    <img src="{{ listing.image }}" class="rounded mx-auto d-block" alt="Image not available">
+    <br>
+    <br>
+    <h6 class="display-6 text-muted">{{ listing.description }}</h6>
+    <br>
+    <h2> $ {{ listing.price }}</h2>
+    {% if  listing.status != "CLOSED" %} 
+        {% if user.id == current_bid.user.id %}
+            <h6 class="display-6 text-muted" style="font-size: small;">{{ bid_count }} bid(s) so far. Your bid is the current bid</h6>
+        {% else %}
+            <h6 class="display-6 text-muted" style="font-size: small;">{{ bid_count }} bid(s) so far.</h6>
+        {% endif %}
+            <form action = "{{ listing.id }}" method="post">
+                {% csrf_token %}
+                {{ bidform }}
+                <br>    
+                <input type="submit" value="Place Bid" class="btn btn-primary mb-3" >
+            </form>
+    {% else %}
+        {% if user.id == current_bid.user.id %}
+            <hr>
+            <h1 class="display-3">You are the highest bidder for this listing. </h1>
+            <hr>
+        {% else %}
+            <hr>
+            <h1 class="display-3">Bidding closed.</h1>
+            <hr>
+        {% endif %}
+    {% endif %}
+    <h3>Details</h3>
+    <ul> 
+        <li>Listed by : {{ listing.user.username }}</li>
+        {% if listing.category == null %}
+           <li>Category : No Category Listed </li>
+        {% else %}
+           <li>Category : {{ listing.category.category }}</li>
+        {% endif %}
+        <li>Listing date : {{ listing.date }}</li>
+    </ul>
+    <ul class="list-group list-group-flush">
+        <h3>Comments</h3>
+        {% for comment in comments %}
+        <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div class="ms-2 me-auto">
+              <div class="fw-bold"><b> {{ comment.user.username }}</b></div>
+               {{ comment.comment }}
+            </div>
+          </li>
+        {% endfor %}
+    </ul>
+    {% if  listing.status != "CLOSED" %} 
+        <div class="ms-2 me-auto"><br>
+           <form action="{{ listing.id }}" method="post">
+               {% csrf_token %}
+               {{ commentform }}
+               <br>
+               <input type="submit" value="Add comment" class="btn btn-primary mb-3" >
+           </form>
+        </div>
+    {% endif %}
+{% endblock%}

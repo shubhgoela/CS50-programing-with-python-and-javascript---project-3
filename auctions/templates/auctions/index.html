@@ -1,0 +1,45 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    {% if listing_type == "ACTIVE" %}
+      <h2>Active Listings</h2>
+    {% elif listing_type == "WATCHLIST" %}
+      <h2>Watchlist</h2>
+    {% elif listing_type == "bids" %}
+      <h2>Winning bids</h2>
+    {% elif listing_type == "self" %}
+      <h2>Your listings</h2>
+    {% else %}
+      <h2> Category : {{ listing_type }}</h2>
+     {% endif%} 
+    {% for item in listings %}
+    <a href="/listing/{{ item.id }}" style="text-decoration: none; color: black;">
+        <div class="d-flex p-2 bd-highlight border" style="--bs-gap: .25rem 1rem;">
+            <div class="container">
+                <div class="row">
+                  <div class="col-4">
+                    <img src="{{ item.image }}" class="img-fluid" alt=" Image not found"> 
+                 </div>
+                  <div class="col">
+                    <ul class="list-unstyled">
+                        <li>
+                            <p class="h1">{{ item.title }}</p>
+                        </li>
+                        <li>
+                            <p class="h5">Price: <small> $ {{item.price}} </small></p>
+                        </li>
+                        {% if item.description != "" %}
+                           <li><h6 class="display-6">{{ item.description }}</h6></li>
+                        {% endif %}
+                        <li>
+                            <p class="h6"><small class="text-muted"> Created {{ item.date }}</small></p>
+                        </li>
+                      </ul>
+                  </div>
+                </div>
+              </div>
+        </div>
+    </a>
+    <br>
+    {% endfor %}
+{% endblock %}
