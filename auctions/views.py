@@ -12,7 +12,7 @@ from .forms import BidForm, CommentForm, ListingForm, WatchlistForm
 def index(request):
         return render(request, "auctions/index.html",{
             "listing_type" : "ACTIVE",
-            "listings": Listing.objects.filter(status = "BID")| Listing.objects.filter(status = "ACTIVE")
+            "listings": (Listing.objects.filter(status = "BID") | Listing.objects.filter(status = "ACTIVE")).reverse()[ ::-1]
         })
 
 @login_required(login_url='/')
@@ -20,7 +20,7 @@ def index2(request):
     return render(request, "auctions/index.html",{
         "listing_type" : "ACTIVE",
         "watchlistcount" : User.objects.get(pk = request.session['_auth_user_id']).watchlist.count(),
-        "listings": Listing.objects.filter(status = "BID")| Listing.objects.filter(status = "ACTIVE")
+        "listings": (Listing.objects.filter(status = "BID") | Listing.objects.filter(status = "ACTIVE")).reverse()[ ::-1]
     })
 
 def login_view(request):
@@ -228,7 +228,7 @@ def listing(request, id):
 
 @login_required(login_url='/login')
 def watchlist(request):
-    wlist = User.objects.get(pk = request.session['_auth_user_id']).watchlist.all()
+    wlist = User.objects.get(pk = request.session['_auth_user_id']).watchlist.all()             
     listings = []
     for i in wlist: listings.append(i.listing)
     return render(request, "auctions/index.html", {
@@ -258,11 +258,12 @@ def bids(request):
     bid_list = []
     print(listing)
     for i in listing:
-        print(i.bids.all().last())
-        print(i.bids.all().last().user.id)
-        print(i.bids.all().last().user.id == int(request.session["_auth_user_id"]))
-        if i.bids.all().last().user.id == int(request.session["_auth_user_id"]):
-            bid_list.append(i)
+        if i.bids.all().count() > 0:
+            print(i.bids.all().last())
+            print(i.bids.all().last().user.id)
+            print(i.bids.all().last().user.id == int(request.session["_auth_user_id"]))
+            if i.bids.all().last().user.id == int(request.session["_auth_user_id"]):
+                bid_list.append(i)
     #request.session['bid_set'] = set(request.session["bid_list"])
     print(bid_list)
     return render(request, "auctions/index.html",{

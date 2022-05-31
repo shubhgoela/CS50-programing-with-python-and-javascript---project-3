@@ -21,14 +21,15 @@ class BidForm(forms.ModelForm):
     
     def clean(self):
         cleaned_data = super().clean()
-        print(cleaned_data)
+        print("cleaned data: ", cleaned_data)
         bid = cleaned_data.get("bid")
         listing = cleaned_data.get("listing")
-        print(listing,"  id :  ", listing.id)
+        print(listing,"  id :  ", listing.id, " bid : ", bid)
         #print(self)
         #crrbid = self.bid
         #listing = self.listing
         bids = Listing.objects.get(pk = listing.id).bids.all()
+        print("bids : ", bids)
         if bids.count() > 0:
             crrnt_bid = bids.aggregate(Max('bid'))
             if bid <= crrnt_bid['bid__max']:
@@ -36,8 +37,9 @@ class BidForm(forms.ModelForm):
                 self.add_error('bid', msg)
         else:
             if bid <= Listing.objects.get(pk = listing.id).price:
-                msg = f"The bid must be greater than {Listing.objects.get(pk = listing).price}."
+                msg = f"The bid must be greater than {Listing.objects.get(pk = listing.id).price}."
                 self.add_error('bid', msg)
+        
         
 
 
