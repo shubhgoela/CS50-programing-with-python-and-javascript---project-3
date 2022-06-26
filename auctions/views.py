@@ -245,7 +245,11 @@ def category(request):
     })
 
 def listcategory(request, id):
-    listings = Category.objects.get(code = id).cat_listings.all()
+    l = Category.objects.get(code = id).cat_listings.all()
+    listings = []
+    for i in l:
+        if i.status != "CLOSED":
+            listings.append(i)
     print(request.session['_auth_user_id'])
     return render(request,"auctions/index.html",{
         "watchlistcount" : User.objects.get(pk = request.session['_auth_user_id']).watchlist.all().count(),
